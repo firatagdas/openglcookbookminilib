@@ -1,0 +1,13 @@
+//
+// Created by Firat Agdas on 3/17/18.
+//
+
+#ifndef OPENGLLEARNINGLIBRARY_COMMON_H
+#define OPENGLLEARNINGLIBRARY_COMMON_H
+
+
+#define NAMESPACE_BEGIN(A) namespace A {
+
+#define NAMESPACE_END }
+
+#endif //OPENGLLEARNINGLIBRARY_COMMON_H
