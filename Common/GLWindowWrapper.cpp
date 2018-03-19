@@ -13,6 +13,8 @@
 #define FPS_MAX 60
 #define MS_PER_UPDATE (1.0 / FPS_MAX)
 
+LOGGER_CATEGORY(GLWindow, "GL Window Management")
+
 GLWindowWrapper::GLWindowWrapper(bool debugMode)
         : m_debug(debugMode)
         , m_handle(nullptr)
@@ -27,12 +29,9 @@ bool GLWindowWrapper::init() {
     int result = glfwInit();
     if (!result) {
         if (m_debug)
-            Logger::shared().error("GLFW initialization failed.");
+            logCError(GLWindow, "GLFW initialization failed.");
     } else if (m_debug) {
-        char messageBuffer[128];
-        sprintf(messageBuffer, "GLFW successfully initialized. GLFW Version: %s.", glfwGetVersionString());
-
-        Logger::shared().debug(messageBuffer);
+        logCDebugV(GLWindow, "GLFW successfully initialized. GLFW Version: %s.", glfwGetVersionString());
     }
 
     return result == GLFW_TRUE;
@@ -41,7 +40,7 @@ bool GLWindowWrapper::init() {
 void GLWindowWrapper::setSize(int width, int height) {
     if (m_width <= 0 || m_height <= 0) {
         if (!m_debug)
-            Logger::shared().warning("Width & Height cannot be negative or zero.");
+            logCWarning(GLWindow, "Width & Height cannot be negative or zero.");
 
         return;
     }
@@ -50,17 +49,14 @@ void GLWindowWrapper::setSize(int width, int height) {
         m_width = width;
         m_height = height;
 
-        if (m_debug) {
-            char messageBuffer[100];
-            sprintf(messageBuffer, "Setting window size to %dx%d.", m_width, m_height);
-            Logger::shared().debug(messageBuffer);
-        }
+        if (m_debug)
+            logCDebugV(GLWindow, "Setting window size to %dx%d.", m_width, m_height);
 
         if (m_handle)
             glfwSetWindowSize(m_handle, m_width, m_height);
+
     } else if (m_debug) {
-        char messageBuffer[100];
-        sprintf(messageBuffer, "Window is the same size to with given %dx%d.", m_width, m_height);
+        logCDebugV(GLWindow, "Window is the same size to with given %dx%d.", m_width, m_height);
     }
 }
 
@@ -81,7 +77,7 @@ void GLWindowWrapper::setTitle(const char *title) {
 bool GLWindowWrapper::build() {
     if (m_handle) {
         if (m_debug)
-            Logger::shared().warning("There is a window already. Cannot be rebuilt.");
+            logCWarning(GLWindow, "There is a window already. Cannot be rebuilt.");
 
         return false;
     }
@@ -98,7 +94,7 @@ bool GLWindowWrapper::build() {
     m_handle = glfwCreateWindow(m_width, m_height, m_title, nullptr, nullptr);
     if (!m_handle) {
         if (m_debug)
-            Logger::shared().error("Window couldn't be created.");
+            logCError(GLWindow, "Window couldn't be created.");
 
         glfwTerminate();
         return false;
@@ -110,11 +106,8 @@ bool GLWindowWrapper::build() {
     glewExperimental = GL_TRUE;
     GLenum glewErrorStatus = glewInit();
     if (glewErrorStatus != GLEW_OK) {
+        logCErrorV(GLWindow, "Unable to initialize GLEW. Error: %s\n", glewGetErrorString(glewErrorStatus));
 
-        char messageBuffer[1024];
-        sprintf(messageBuffer, "Unable to initialize GLEW. Error: %s\n", glewGetErrorString(glewErrorStatus));
-
-        Logger::shared().error(messageBuffer);
         glfwTerminate();
 
         m_handle = nullptr;
@@ -174,7 +167,7 @@ int GLWindowWrapper::run() {
     int result = 0;
     if (!m_handle) {
         if (m_debug)
-            Logger::shared().critical("Window is not created yet. So running does not make sense.");
+            logCCritical(GLWindow, "Window is not created yet. So running does not make sense.");
 
         result = 1;
     } else {

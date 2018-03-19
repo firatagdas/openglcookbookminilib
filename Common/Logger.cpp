@@ -9,7 +9,37 @@ Logger::Logger()
     : m_format("[%s]: %s\n") {
 }
 
-void Logger::log(LogType type, const char *message) {
+void Logger::log(LogType type, const char *message, ...) {
+    va_list args;
+    va_start(args, message);
+
+    char buffer[2048];
+
+    vsnprintf(buffer, 2048, message, args);
+    va_end(args);
+
+    print(m_format, type, buffer);
+}
+
+void Logger::log(const char *category, LogType type, const char *message, ...) {
+    va_list args;
+    va_start(args, message);
+
+    char buffer[2048];
+
+    vsnprintf(buffer, 2048, message, args);
+    va_end(args);
+
+    std::string tmp;
+    tmp.append("[");
+    tmp.append(category);
+    tmp.append("]: ");
+    tmp.append(buffer);
+
+    print(m_format, type, tmp.c_str());
+}
+
+void Logger::print(const char *format, LogType type, const char *message) {
     char typeIndicator[2];
 
     switch (type) {
@@ -44,16 +74,14 @@ void Logger::log(LogType type, const char *message) {
         case Info:
         case Verbose:
         case Warning:
-            fprintf(stdout, m_format, (const char *) &typeIndicator, message);
+            fprintf(stdout, format, (const char *) &typeIndicator, message);
             break;
 
         case Critical:
         case Error:
-            fprintf(stderr, m_format, (const char *) &typeIndicator, message);
+            fprintf(stderr, format, (const char *) &typeIndicator, message);
             break;
     }
-
-    fprintf(stdin, "%s\n", "Logginggggg");
 }
 
 Logger Logger::m_sharedInstance;

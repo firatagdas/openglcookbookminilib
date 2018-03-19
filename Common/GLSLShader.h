@@ -9,22 +9,26 @@
 #include <OpenGL/gl.h>
 #include <map>
 #include <vector>
+#include "Logger.h"
+
+LOGGER_DECLARE_CATEGORY(GLSLShader)
+
 
 class GLSLShader {
 public:
     enum ShaderType {
-        Vertext,
+        Vertext = 0,
         Fragment,
         Geometry
     };
 
-    GLSLShader();
+    GLSLShader(bool debug = false);
     ~GLSLShader();
 
     void loadFromString(ShaderType type, const char *source);
     void loadFromFile(ShaderType type, const char *filePath);
 
-    void createAndLinkProgrem();
+    void createAndLinkProgram();
 
     void use();
     void unuse();
@@ -32,8 +36,8 @@ public:
     void addAttribute(const char *attribute);
     void addUniform(const char *uniform);
 
-    GLuint getAttribute(const char *attribute);
-    GLuint getUniform(const char *uniform);
+    GLint getAttribute(const char *attribute);
+    GLint getUniform(const char *uniform);
 
     void deleteProgram();
 
@@ -43,11 +47,13 @@ private:
     GLuint m_shaderList[3];
     int m_shaderCount;
 
-    std::map<const char *, GLuint> m_attributeMap;
-    std::map<const char *, GLuint> m_uniformMap;
+    std::map<const char *, GLint> m_attributeMap;
+    std::map<const char *, GLint> m_uniformMap;
 
     bool m_inUse;
     bool m_created;
+
+    bool m_debug;
 };
 
 

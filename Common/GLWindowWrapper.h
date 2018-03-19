@@ -13,6 +13,9 @@
 #include "Common.h"
 #include <vector>
 #include "RendererAbstract.h"
+#include "Logger.h"
+
+LOGGER_DECLARE_CATEGORY(GLWindow)
 
 class GLWindowWrapper {
 public:
